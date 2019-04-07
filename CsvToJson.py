@@ -4,7 +4,7 @@ import json
 class CsvToJson:
     def __init__(self, csv_filename):
         self.csvFile = open(csv_filename, 'r')
-        self.jsonFile = open('converted.json', 'w')
+        self.jsonFile = open('output.json', 'w')
         self.jsonFile.write("[")
 
     def showCsv(self):
@@ -28,4 +28,4 @@ class CsvToJson:
         self.jsonFile.write("]")
         self.jsonFile.close()
 
-CsvToJson("Articles.csv").convert()
+CsvToJson("output.csv").convert()
