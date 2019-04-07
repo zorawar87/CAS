@@ -2,10 +2,12 @@
   <library name="java-json">
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/../java-json.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jar_file/java-json.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
       <root url="jar://$PROJECT_DIR$/../java-json.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jar_file/java-json.jar!/" />
     </SOURCES>
   </library>
 </component>
