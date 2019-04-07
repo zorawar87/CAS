@@ -19,9 +19,7 @@
     </div>
     <ul class="nav navbar-nav">
       <li class="active"><a href="#">Home</a></li>
-      <li><a href="cas.html">CAS</a></li>
-      <li><a href="#">Nav 2</a></li>
-      <li><a href="#">Nav 3</a></li>
+      <li><a href="/cas">CAS</a></li>
     </ul>
   </div>
 </nav>
@@ -38,25 +36,24 @@
     </form>
 <div id="contents">
     {% if analysis %}
-    <h3 class="text-justify">{{analysis}}</h3>
+    <h3 class="text-justify">Your article on <strong>{{analysis.keyphrase}}</strong> was <code>{{analysis.score}}%</code> positive</h3>
     {% endif %}
 
     {% if analysis %}
-    <h4 class="text-justify">{{analysis}}</h4>
     <div class="container">
     <div class="row">
 
         {% for article in articles%}
         <div class="col-xs-6 well"id="divcard">
             <div class="caption">
-                <h5>{{ article.score }}</h5>
+                <h5>Source: {{ article.website }}</h5>
                 <div class="card bg-light">
                     <div class="card-body">
                         <p class="card-text well">{{article.description}}</p>
                     </div>
                 </div>
                 <p>
-                <a href="{{article.link}}" class="btn btn-primary" role="button"id="link">Button</a>
+                <a href="{{article.link}}" class="btn btn-primary" role="button"id="link">Link to Full Article</a>
                 </p>
             </div>
         </div>

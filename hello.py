@@ -30,8 +30,12 @@ def cas_app():
         print(info)
         return render_template('cas-analysis.html', 
                 blogpost = request.form["blogpost"],
-                analysis = "Your article on %s was %f%% positive." % (info["keyPhrases"][0],info["score"]*100))
-
+                analysis = {"keyphrase" : info["keyPhrases"][0],"score": info["score"]*100},
+                articles = [
+                    {"score":0.5, "description": "this is positive", "link":"https://google.com", "website":"google.com"},
+                    {"score":0.6, "description": "this is negative", "link":"https://yahoo.com", "website":"yahoo.com"}
+                    ]
+                )
     return render_template('cas-analysis.html')
 
 

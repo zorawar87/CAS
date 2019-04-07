@@ -115,7 +115,6 @@ class TextAnalyser:
     def getArticleById(self, uid):
         return self.rawJson[uid-1]
 
-
 """
 TextAnalyser({ 
     'documents': [ 
