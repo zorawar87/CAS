@@ -22,9 +22,9 @@ public class Post {
     @Override
     public String toString() {
 
-        return id + "⁓en⁓" + (url != null ? url : "")
-                + "⁓" + (text != null ? text : "")
-                + "⁓⁓⁓" + (website != null ? website : "")
-                + "⁓" + (date != null ? date : "");
+        return id + "~en~" + (url != null ? url : "")
+                + "~" + (text != null ? text : "")
+                + "~~~" + (website != null ? website : "")
+                + "~" + (date != null ? date : "");
     }
 }
