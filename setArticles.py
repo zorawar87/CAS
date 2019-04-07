@@ -1,4 +1,14 @@
+import numpy as np
+import pandas as pd
+import json
+
+
 class ArticleGenerator:
+        # def __init__(self jsonSource):
+        #         self.Dataset = jsonSource
+        #         #precomputation / filtering
+
+
     def setArticles(self, Scoring, KeyPhrases, Dataset):
 
             # Scoring is Dict with arg 'scoring'
@@ -7,17 +17,13 @@ class ArticleGenerator:
             ### ({id = , score = }, {id = , keyPhrases = })
 
 
-            import numpy as np
-            import pandas as pd
-
-
             # User 'input'
             # KeyPhrases['keyPhrases'] = KeyPhrases['keyPhrases'].split(',') # TODO - how will it be deliminated?
-            U_I = Scoring['scoring']
-            U_I_KP = [KeyPhrases['keyPhrases'].str.len()]
+            U_I = [Scoring['scoring']]
+            U_I_KP = len(KeyPhrases['keyPhrases'])
 
             # Number of keywords with the capital
-            x = [str.istitle(y) for y in U_I_KP]
+            x = [str.istitle(KeyPhrases['keyPhrases'][y]) for y in range(U_I_KP)]
             x = np.sum(x)
             U_I += [x]
 
@@ -25,11 +31,10 @@ class ArticleGenerator:
             U_I += [U_I[1]/U_I[0]]
 
             ### Preprocessing
-            # Dataset = Dataset[0]
             data = pd.DataFrame(index = range(len(Dataset)), columns = ['ID', 'Keywords', 'Sentiment'])
             for k in range(len(Dataset)):
-                    data.iloc[k,:] = [Dataset[k][0]['id'], Dataset[k][1]['keyPhrases'], Dataset[k][0]['score']]
-
+                    data.iloc[k,:] = [Dataset[k][0]['id'], 0, Dataset[k][0]['score']]
+                    data.at[k,'Keywords'] = Dataset[k][1]['keyPhrases']
             #----------------------------#
 
             # Classify the articles from the database to our post
@@ -38,26 +43,24 @@ class ArticleGenerator:
 
             IfIsIn = []
             for k in range(data.shape[0]):
-                    IfIsIn += [(('Brexit' in (' '.join(data.Keywords))) | ('brexit' in (' '.join(data.Keywords))))]
+                    IfIsIn += [(('Brexit' in (' '.join(data.Keywords[k]))) | ('brexit' in (' '.join(data.Keywords[k]))))]
+
+            # Filtering the data
+            data = data[IfIsIn]
 
             #----------------------------#
-
-            from itertools import compress
-
-
-            data.Keywords = list(compress(Dataset, IfIsIn))
 
             # Number of keywords
             NrKeywords = []
             for k in range(len(Dataset)):
-                    NrKeywords = data.Keywords.str.len
+                    NrKeywords = data.Keywords.str.len()
             
             data['NrKeywords'] = NrKeywords
             
             # Number of keywords with the capital
             CapKeywords = []
-            for i in range(len(Dataset)):
-                    x = [str.istitle(y) for y in Dataset[i][1]['keyPhrase']]
+            for i in range(data.shape[0]):
+                    x = [str.istitle(y) for y in data.Keywords.iloc[i]]
                     x = np.sum(x)
                     CapKeywords += [x]
 
@@ -111,7 +114,7 @@ class ArticleGenerator:
 
 
             # Top Keywords
-            TopKeywords = TopKeywords[(TopKeywords[1] >= 5)].drop_duplicates()[0]
+            TopKeywords = TopKeywords[(TopKeywords[1] >= max(TopKeywords[1]))].drop_duplicates()[0]
 
             # Are they in our Keywords series?
             TopInData = []
@@ -119,7 +122,7 @@ class ArticleGenerator:
                     TopInData += [TopKeywords.isin(i).sum()]
 
             # Are they in U_I?
-            TopInU_I = TopKeywords.isin(KeyPhrases['keyPhrases'])
+            TopInU_I = sum(TopKeywords.isin(KeyPhrases['keyPhrases']))
 
             # Creating new variables - how many of the TopKeywords does the article have?
             data['Top'] = [x/len(TopKeywords) for x in TopInData]
@@ -127,7 +130,7 @@ class ArticleGenerator:
 
             # How many TopKeywords does one article have in comparison to all the keywords from that article?
             data['RelTop'] = TopInData/data.NrKeywords
-            U_I += [TopInU_I/KeyPhrases['keyPhrases']]
+            U_I += [TopInU_I/len(KeyPhrases['keyPhrases'])]
 
             #------------------------------------#
 
@@ -147,7 +150,7 @@ class ArticleGenerator:
             # Clustering
 
             from sklearn.cluster import KMeans
-            n_recommendations = 2
+            n_recommendations = 8
 
             import math
             NClus = min(3,math.ceil(Final_norm.shape[0] / n_recommendations))
@@ -186,8 +189,8 @@ class ArticleGenerator:
             #     print('Train: %s | test: %s' % (train_indices, test_indices))
 
             # Splitting the dataset into the Training set and Test set
-            from sklearn.model_selection import train_test_split
-            X_train, X_test, y_train, y_test = train_test_split(Final_norm, y_kmeans_OHE, test_size = 0.25, random_state = 0)
+        #     from sklearn.model_selection import train_test_split
+        #     X_train, X_test, y_train, y_test = train_test_split(Final_norm, y_kmeans_OHE, test_size = 0.25, random_state = 0)
 
 
             from sklearn import svm
@@ -217,14 +220,14 @@ class ArticleGenerator:
             Best = ([i for i, x in enumerate([x == Ma for x in y_kmeans]) if x])
             Worst = ([i for i, x in enumerate([x == Mi for x in y_kmeans]) if x])
 
-            Best = data.loc[Best, :]
-            Worst = data.loc[Worst, :]
+            Best = data.iloc[Best, :]
+            Worst = data.iloc[Worst, :]
 
-            return (Best.to_json(), Worst.to_json())
+            return (Best[:2].to_json(), Worst[:2].to_json())
 
 
-import json
 with open("dataset.json") as db:
     jsonSource = json.load(db)
 
-ArticleGenerator().setArticles(0.71356559, ["brexit", "finance"], jsonSource)
+ArticleGenerator().setArticles({"scoring":0.71356559}, {'keyPhrases':["brexit", "finance"]}, jsonSource)
+# ArticleGenerator(jsonSource).setArticles({"scoring":0.71356559}, {'keyPhrases':["brexit", "finance"]})
