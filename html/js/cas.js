@@ -19,3 +19,7 @@ $("#btn3").click(function(event) {
     
   $("#output").html(input + " lorem ipsum");
 });
+
+$("#submit").click(function(event) {
+   $("#contents").toggle();
+});
