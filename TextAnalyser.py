@@ -40,7 +40,6 @@ class TextAnalyser:
         self.rowsProcessed += self.batch_size
         return self.documents
 
-
     def getLanguage  (self):
         return self.postRequest("languages")
 
@@ -49,6 +48,12 @@ class TextAnalyser:
 
     def getKeyPhrases(self):
         return self.postRequest("keyPhrases")
+
+    def getKeyInfo(self):
+        s = self.getSentiment()
+        k = self.getKeyPhrases()
+        s["documents"][0].update(k["documents"][0])
+        return s["documents"][0] 
 
     def show(self):
         print(self.documents)

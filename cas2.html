@@ -27,22 +27,23 @@
 </nav>
   
 <div class="container">
-    <h4>Please insert your input:</h4>
+    <h2>Please insert your input:</h2>
     <form method="POST" id="blogpost_data">
       <div class="form-group">
         <label for="comment"></label>
-        <textarea class="form-control" rows="5" id="input" name="blogpost">{% if blogpost %}{{blogpost}}{% endif %}</textarea><br>
-        <button type="submit" class="btn btn-success" id="submit">Submit</button>
-        <button type="reset" class="btn btn-dark" id="reset">Reset</button><br>
+        <textarea class="form-control" rows="5" id="input" name="blogpost">
+            {% if blogpost %}
+                {{ blogpost }}
+            {% endif %}
+        </textarea><br>
+        <button type="submit" class="btn btn-default" id="submit">Submit</button><br><br>
       </div>
     </form>
 <div id="contents">
     {% if analysis %}
-    <h3 class="text-justify">{{analysis}}</h3>
+    <p class="text-justify">{{ analysis }}</p>
     {% endif %}
 
-    {% if analysis %}
-    <h4 class="text-justify">{{analysis}}</h4>
     <div class="container">
     <div class="row">
     <div class="col-xs-6 well">
@@ -104,11 +105,10 @@
 
     </div>
     </div>
-    {% endif %}
 
 </div>
 
 </div>
-  <script src="{{ url_for('static', filename='js/cas.js' )}} "></script>
+  <script src="{{ url_for('static', filename='js/cas.js' }} "></script>
 </body>
 </html>

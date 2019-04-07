@@ -25,8 +25,10 @@ def show_path(subpath):
 @app.route('/cas/', methods=['POST','GET'])
 def cas_app():
     if request.method == "POST":
-        print(TextAnalyser(request.form["entrypost"]).retrieve())
-        return json.dumps(TextAnalyser(request.form["entrypost"]).getKeyPhrases())
-    return render_template('cas.html')
+        print(TextAnalyser(request.form["blogpost"]).retrieve())
+        info = TextAnalyser(request.form["blogpost"]).getKeyInfo()
+        return render_template('cas-analysis.html', blogpost = request.form["blogpost"],
+                analysis = "Your article on %s was %f%% positive." % (info["keyPhrases"][0],info["score"]*100))
+    return render_template('cas-analysis.html')
 
 
