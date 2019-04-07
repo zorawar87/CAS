@@ -18,7 +18,7 @@ class CsvToJson:
     def convert(self):
         fieldnames = ("id", "language", "link","text","keywords","sentiment","website","date")
         writeComma = False
-        reader = csv.DictReader(self.csvFile, fieldnames)
+        reader = csv.DictReader(self.csvFile, fieldnames, delimiter='~')
         for row in reader:
             if (writeComma):
                 self.jsonFile.write(",")
