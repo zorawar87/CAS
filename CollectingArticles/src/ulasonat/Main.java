@@ -52,7 +52,7 @@ public class Main {
         }
 
         BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
-        writer.write("Id⁓language⁓Link⁓Text⁓Keywords⁓Sentiment⁓Website⁓Date\n");
+        writer.write("Id~language~Link~Text~Keywords~Sentiment~Website~Date\n");
         writer.write(fileContent);
         writer.close();
     }
