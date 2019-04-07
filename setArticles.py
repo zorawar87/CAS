@@ -219,5 +219,4 @@ def setArticles(Scoring, KeyPhrases, Dataset)
         Best = data.loc[Best, :]
         Worst = data.loc[Worst, :]
 
-        return Best.to_json()
-        return Worst.to_json()
+        return (Best, Worst).to_json()
