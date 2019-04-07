@@ -24,7 +24,7 @@ def setArticles(Scoring, KeyPhrases, Dataset)
         U_I += [U_I[1]/U_I[0]]
 
         ### Preprocessing
-        Dataset = Dataset[0]
+        # Dataset = Dataset[0]
         data = pd.DataFrame(index = range(len(Dataset)), columns = ['ID', 'Keywords', 'Sentiment'])
         for k in range(len(Dataset)):
                 data.iloc[k,:] = [Dataset[k][0]['id'], Dataset[k][1]['keyPhrases'], Dataset[k][0]['score']]
