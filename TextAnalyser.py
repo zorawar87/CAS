@@ -11,7 +11,9 @@ class TextAnalyser:
                     "Accept":"application/json"
                 }
     #batch_size = 1800
-    batch_size = 8
+    start = 300
+    limit = 400
+    batch_size = 10
     isSingle = False
 
     def __init__(self, data=None):
@@ -29,9 +31,7 @@ class TextAnalyser:
             return requests.post(self.text_analytics_base_url+service, headers=self.headers, json=self.documents).json()
         else:
             results = []
-            #while (self.rowsProcessed < len(self.rawJson) and self.rowsProcessed < self.rowsProcessed + self.batch_size):
-            while (self.rowsProcessed < self.batch_size*5 and self.rowsProcessed < self.rowsProcessed + self.batch_size):
-                print(self.rowsProcessed)
+            while (self.rowsProcessed < self.limit and self.rowsProcessed < self.rowsProcessed + self.batch_size):
                 response  = requests.post(self.text_analytics_base_url+service, headers=self.headers, json=self.prepareDocuments())
                 results.append(response.json())
                 self.rowsProcessed += self.batch_size
@@ -61,18 +61,18 @@ class TextAnalyser:
         return results
 
     def getLanguage  (self):
-        self.rowsProcessed = 0
+        self.rowsProcessed = self.start
         return self.postRequest("languages")
 
     def getSentiment (self):
-        self.rowsProcessed = 0
+        self.rowsProcessed = self.start
         if self.isSingle:
             return self.postRequest("sentiment")
         else:
             return self.mergeBatches(self.postRequest("sentiment"))
 
     def getKeyPhrases(self):
-        self.rowsProcessed = 0
+        self.rowsProcessed = self.start
         if self.isSingle:
             return self.postRequest("keyPhrases")
         else:
@@ -92,16 +92,27 @@ class TextAnalyser:
 
     def interleave(self):
         dataset = []
+        print("starting sentiment")
         sentiments = self.getSentiment()
+        print("starting phrases")
         phrases = self.getKeyPhrases()
+        print("zipping")
         dataset.extend(zip(sentiments, phrases))
         return dataset
 
     def write(self, dataset):
-        with open("dataset.json",'w') as ds:
+        print("writing")
+        with open("dataset2.json",'a') as ds:
             json.dump(dataset, ds)
+            ds.write("\n")
 
-t = TextAnalyser()
+    def controller(self, beg):
+        self.start = beg
+        self.limit = beg+100
+        self.write(self.interleave())
+        print("success! %d" % (beg+100))
+
+
 
 """
 TextAnalyser({ 
