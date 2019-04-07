@@ -34,6 +34,7 @@ public class Main {
                 JSONObject thread = (JSONObject) jsonArray.getJSONObject(j).get("thread");
                 String website = (String) thread.get("site");
                 String date = (String) jsonArray.getJSONObject(j).get("published");
+
                 posts.add(new Post(text, url, website, date));
             }
         }
@@ -51,7 +52,7 @@ public class Main {
         }
 
         BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
-        writer.write("Id,language,Link,Text,Keywords,Sentiment,Website,Date\n");
+        writer.write("Id⁓language⁓Link⁓Text⁓Keywords⁓Sentiment⁓Website⁓Date\n");
         writer.write(fileContent);
         writer.close();
     }

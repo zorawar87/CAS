@@ -10,6 +10,7 @@ public class Post {
     private String website;
     private String date;
 
+
     public Post(String text, String url, String website, String date) {
         this.text = text;
         this.url = url;
@@ -20,6 +21,10 @@ public class Post {
 
     @Override
     public String toString() {
-        return id + ",en," + url + "," + text + ",," + website + "," + date;
+
+        return id + "⁓en⁓" + (url != null ? url : "")
+                + "⁓" + (text != null ? text : "")
+                + "⁓⁓⁓" + (website != null ? website : "")
+                + "⁓" + (date != null ? date : "");
     }
 }
