@@ -112,7 +112,8 @@ class TextAnalyser:
         self.write(self.interleave())
         print("success! %d" % (beg+100))
 
-
+    def getArticleById(self, uid):
+        return self.rawJson[uid-1]
 
 """
 TextAnalyser({ 
