@@ -11,6 +11,8 @@ class TextAnalyser:
                     "Accept":"application/json"
                 }
     #batch_size = 1800
+    start = 300
+    limit = 400
     batch_size = 10
     isSingle = False
 
@@ -22,32 +24,59 @@ class TextAnalyser:
                 #self.documents = { 'documents': json.load(jsonSource) }
         else:
             self.isSingle = True
-            self.documents = { 'documents': [{'id':1, 'language':'en', 'text':data }]}
+            self.documents = {'documents': [{'id':1, 'language':'en', 'text': data}]}
 
     def postRequest(self, service):
         if self.isSingle:
             return requests.post(self.text_analytics_base_url+service, headers=self.headers, json=self.documents).json()
         else:
             results = []
-            while (self.rowsProcessed < self.batch_size):
-                print(self.rowsProcessed)
+            while (self.rowsProcessed < self.limit and self.rowsProcessed < self.rowsProcessed + self.batch_size):
                 response  = requests.post(self.text_analytics_base_url+service, headers=self.headers, json=self.prepareDocuments())
-                results.push(response.json())
+                results.append(response.json())
+                self.rowsProcessed += self.batch_size
             return results
 
     def prepareDocuments(self):
-        self.documents = { 'documents': self.rawJson[self.rowsProcessed:(self.rowsProcessed+self.batch_size)]}
-        self.rowsProcessed += self.batch_size
+        subarray = self.rawJson[self.rowsProcessed:(self.rowsProcessed+self.batch_size)]
+        for article in subarray:
+            article["text"] = article["text"][0:5000]
+        self.documents = {'documents': subarray}
         return self.documents
 
+    def mergeBatches(self, batches):
+        singular =[]
+        for batch in batches:
+            singular.extend(batch["documents"])
+        return singular
+
+    def mergeWithSource(self, results):
+        for result in results:
+            for score in result["documents"]:
+                try:
+                    score.update(self.rawJson[int(score["id"])])
+                except ValueError:
+                    print("error with ")
+                    pprint(score)
+        return results
+
     def getLanguage  (self):
+        self.rowsProcessed = self.start
         return self.postRequest("languages")
 
     def getSentiment (self):
-        return self.postRequest("sentiment")
+        self.rowsProcessed = self.start
+        if self.isSingle:
+            return self.postRequest("sentiment")
+        else:
+            return self.mergeBatches(self.postRequest("sentiment"))
 
     def getKeyPhrases(self):
-        return self.postRequest("keyPhrases")
+        self.rowsProcessed = self.start
+        if self.isSingle:
+            return self.postRequest("keyPhrases")
+        else:
+            return self.mergeBatches(self.postRequest("keyPhrases"))
 
     def getKeyInfo(self):
         s = self.getSentiment()
@@ -60,6 +89,30 @@ class TextAnalyser:
 
     def retrieve(self):
         return self.documents
+
+    def interleave(self):
+        dataset = []
+        print("starting sentiment")
+        sentiments = self.getSentiment()
+        print("starting phrases")
+        phrases = self.getKeyPhrases()
+        print("zipping")
+        dataset.extend(zip(sentiments, phrases))
+        return dataset
+
+    def write(self, dataset):
+        print("writing")
+        with open("dataset2.json",'a') as ds:
+            json.dump(dataset, ds)
+            ds.write("\n")
+
+    def controller(self, beg):
+        self.start = beg
+        self.limit = beg+100
+        self.write(self.interleave())
+        print("success! %d" % (beg+100))
+
+
 
 """
 TextAnalyser({ 
